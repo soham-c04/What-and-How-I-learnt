@@ -1,0 +1,16 @@
+prog
+    a := b + c - d;
+    if x>y then
+        if x>z then
+            print x
+        else 
+            print z
+        end
+    else
+        if y>z then
+            print y
+        else
+            print z
+        end
+    end
+end

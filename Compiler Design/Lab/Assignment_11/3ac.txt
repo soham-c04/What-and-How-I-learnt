@@ -1,0 +1,12 @@
+t1 = 3 + 4
+a = t1
+b = a * 2
+c = b + 1
+if c>d goto L2
+goto L1:
+a = 3
+r = 4
+L1:
+d = c + 5
+L2:
+l = 2

@@ -1,0 +1,884 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Experiment_3</title><meta name="generator" content="MATLAB 9.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2023-08-24"><meta name="DC.source" content="Experiment_3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% DISCRETE TIME CONVOLUTION</span>
+
+<span class="comment">%{
+</span><span class="comment">%1)
+</span><span class="comment">x=input("Enter vector x: ");
+</span><span class="comment">h=input("Enter vector h: ");
+</span><span class="comment">N1=input("Enter the value of N1: ");
+</span><span class="comment">N2=input("Enter the value of N2: ");
+</span><span class="comment">[v,N]=Convolution(x,h,N1,N2);
+</span><span class="comment">disp(v);
+</span><span class="comment">fprintf("Reference is at %d.\n",N);
+</span><span class="comment">%}
+</span>
+<span class="comment">%2)</span>
+<span class="comment">%a)</span>
+subplot(241);
+x=[1 2 3];
+h=[1 -1];
+N1=1;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(245);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+<span class="keyword">for</span> i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+<span class="keyword">end</span>
+stem(nf,v,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%b)</span>
+subplot(242);
+x=[1 2 3];
+h=[1 -1];
+N1=2;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(246);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+<span class="keyword">for</span> i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+<span class="keyword">end</span>
+stem(nf,v,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%c)</span>
+subplot(243);
+x=[1 2 3];
+h=[1 -1];
+N1=3;
+N2=2;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(247);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+<span class="keyword">for</span> i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+<span class="keyword">end</span>
+stem(nf,v,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%d)</span>
+subplot(244);
+x=[0.5 1];
+h=[2 0 2];
+N1=2;
+N2=3;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(248);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+<span class="keyword">for</span> i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+<span class="keyword">end</span>
+stem(nf,v,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+<span class="comment">% CONVOLUTION BUILT-IN FUNCTION</span>
+
+<span class="comment">%3)</span>
+help <span class="string">conv</span>;
+
+<span class="comment">%{
+</span><span class="comment">%4)
+</span><span class="comment">x=input("Enter vector x: ");
+</span><span class="comment">h=input("Enter vector h: ");
+</span><span class="comment">N1=input("Enter the value of N1: ");
+</span><span class="comment">N2=input("Enter the value of N2: ");
+</span><span class="comment">
+</span><span class="comment">v=conv(x,h);
+</span><span class="comment">disp(v);
+</span><span class="comment">
+</span><span class="comment">%}
+</span>
+<span class="comment">%5)</span>
+<span class="comment">%{
+</span><span class="comment">Explanation:- In 2(b) delaying the input signal delays the output signal
+</span><span class="comment">This the due to the nature/basic definition of convolution.
+</span><span class="comment">Convolution of x and h is defined as:-
+</span><span class="comment">Sigma[ k from -INF to +INF (x[k]h[n-k]) ]
+</span><span class="comment">Here, we observe that delaying/shifting x and keeping h constant will
+</span><span class="comment">result in shifting/delaying all the terms of the summation from -INF to
+</span><span class="comment">+INF. Hence, due to this we get a delayed output convolution y[n]
+</span><span class="comment">%}
+</span>
+<span class="comment">%6)</span>
+help <span class="string">convmtx</span>;
+
+<span class="comment">%7)</span>
+<span class="comment">%a)</span>
+subplot(241);
+x=[1 2 3];
+h=[1 -1];
+N1=1;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(245);
+<span class="comment">%v=zeros(1,n+m-1);</span>
+
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%b)</span>
+subplot(242);
+x=[1 2 3];
+h=[1 -1];
+N1=2;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(246);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%c)</span>
+subplot(243);
+x=[1 2 3];
+h=[1 -1];
+N1=3;
+N2=2;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(247);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+
+<span class="comment">%d)</span>
+subplot(244);
+x=[0.5 1];
+h=[2 0 2];
+N1=2;
+N2=3;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+<span class="keyword">for</span> i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+<span class="keyword">end</span>
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+j=1;
+<span class="keyword">for</span> i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+<span class="keyword">end</span>
+
+stem(nx,X,<span class="string">'Color'</span>,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,3); hold <span class="string">ON</span>;
+stem(nx,H,<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,2); hold <span class="string">OFF</span>;
+
+subplot(248);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,<span class="string">'Color'</span>,<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,2);
+</pre><pre class="codeoutput"> CONV Convolution and polynomial multiplication.
+    C = CONV(A, B) convolves vectors A and B.  The resulting vector is
+    length MAX([LENGTH(A)+LENGTH(B)-1,LENGTH(A),LENGTH(B)]). If A and B are
+    vectors of polynomial coefficients, convolving them is equivalent to
+    multiplying the two polynomials.
+ 
+    C = CONV(A, B, SHAPE) returns a subsection of the convolution with size
+    specified by SHAPE:
+      'full'  - (default) returns the full convolution,
+      'same'  - returns the central part of the convolution
+                that is the same size as A.
+      'valid' - returns only those parts of the convolution 
+                that are computed without the zero-padded edges. 
+                LENGTH(C)is MAX(LENGTH(A)-MAX(0,LENGTH(B)-1),0).
+ 
+    Class support for inputs A,B: 
+       float: double, single
+ 
+    See also DECONV, CONV2, CONVN, FILTER, XCORR, CONVMTX.
+ 
+    Note: CONVMTX is in the Signal Processing Toolbox.
+
+    Documentation for conv
+       doc conv
+
+    Other uses of conv
+
+       tall/conv
+
+ CONVMTX Convolution matrix.
+    A = CONVMTX(H,N) returns the convolution matrix, A, such that
+    convolution of H and another vector, X, of length N with the same
+    vector orientation as H may be expressed by matrix multiplication:
+    When H and X are column vectors, A*X is the same as CONV(H,X);
+    when H and X are row vectors, X*A is the same as CONV(H,X).
+ 
+    % Example: 
+    %   Generate a simple convolution matrix.
+ 
+    h = [1 2 3 2 1];
+    convmtx(h,7)        % Convolution matrix
+ 
+    See also CONV.
+
+    Documentation for convmtx
+       doc convmtx
+
+    Other uses of convmtx
+
+       signal/convmtx
+
+</pre><img vspace="5" hspace="5" src="Experiment_3_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% DISCRETE TIME CONVOLUTION
+
+%{
+%1) 
+x=input("Enter vector x: ");
+h=input("Enter vector h: ");
+N1=input("Enter the value of N1: ");
+N2=input("Enter the value of N2: ");
+[v,N]=Convolution(x,h,N1,N2);
+disp(v);
+fprintf("Reference is at %d.\n",N);
+%}
+
+%2)
+%a)
+subplot(241);
+x=[1 2 3];
+h=[1 -1];
+N1=1;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(245);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+for i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+end
+stem(nf,v,'Color','g','LineWidth',2);
+
+%b)
+subplot(242);
+x=[1 2 3];
+h=[1 -1];
+N1=2;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(246);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+for i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+end
+stem(nf,v,'Color','g','LineWidth',2);
+
+%c)
+subplot(243);
+x=[1 2 3];
+h=[1 -1];
+N1=3;
+N2=2;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(247);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+for i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+end
+stem(nf,v,'Color','g','LineWidth',2);
+
+%d)
+subplot(244);
+x=[0.5 1];
+h=[2 0 2];
+N1=2;
+N2=3;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(248);
+[v,N]=Convolution(x,h,N1,N2);
+nf=zeros(1,n+m-1);
+j=1;
+for i=1-N:-N+n+m-1
+    nf(1,j)=i;
+    j=j+1;
+end
+stem(nf,v,'Color','g','LineWidth',2);
+% CONVOLUTION BUILT-IN FUNCTION
+
+%3)
+help conv;
+
+%{
+%4)
+x=input("Enter vector x: ");
+h=input("Enter vector h: ");
+N1=input("Enter the value of N1: ");
+N2=input("Enter the value of N2: ");
+
+v=conv(x,h);
+disp(v);
+
+%}
+
+%5)
+%{
+Explanation:- In 2(b) delaying the input signal delays the output signal
+This the due to the nature/basic definition of convolution.
+Convolution of x and h is defined as:-
+Sigma[ k from -INF to +INF (x[k]h[n-k]) ]
+Here, we observe that delaying/shifting x and keeping h constant will
+result in shifting/delaying all the terms of the summation from -INF to
++INF. Hence, due to this we get a delayed output convolution y[n]
+%}
+
+%6)
+help convmtx;
+
+%7)
+%a)
+subplot(241);
+x=[1 2 3];
+h=[1 -1];
+N1=1;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(245);
+%v=zeros(1,n+m-1);
+
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,'Color','g','LineWidth',2);
+
+%b)
+subplot(242);
+x=[1 2 3];
+h=[1 -1];
+N1=2;
+N2=1;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(246);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,'Color','g','LineWidth',2);
+
+%c)
+subplot(243);
+x=[1 2 3];
+h=[1 -1];
+N1=3;
+N2=2;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(247);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,'Color','g','LineWidth',2);
+
+%d)
+subplot(244);
+x=[0.5 1];
+h=[2 0 2];
+N1=2;
+N2=3;
+h=h';
+n=length(x);
+m=length(h);
+nfinal=max(N1,N2)+max(n-N1,m-N2);
+nx=zeros(1,nfinal);
+j=1-max(N1,N2);
+for i=1:nfinal
+    nx(1,i)=j;
+    j=j+1;
+end
+
+X=zeros(1,nfinal);
+H=zeros(1,nfinal);
+h=h';
+j=1;
+for i=max(N1,N2)-N1+1:max(N1,N2)-N1+n
+    X(1,i)=x(1,j);
+    j=j+1;
+end
+j=1;
+for i=max(N1,N2)-N2+1:max(N1,N2)-N2+m
+    H(1,i)=h(1,j);
+    j=j+1;
+end
+
+stem(nx,X,'Color','r','LineWidth',3); hold ON;
+stem(nx,H,'Color','b','LineWidth',2); hold OFF;
+
+subplot(248);
+A=convmtx(h,length(x));
+con=x*A;
+stem(con,'Color','g','LineWidth',2);
+
+
+
+
+##### SOURCE END #####
+--></body></html>

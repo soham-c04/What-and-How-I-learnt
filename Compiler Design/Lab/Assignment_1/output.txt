@@ -1,0 +1,32 @@
+NFA:
+q_i q2 ε
+q2 q4 ε
+q2 q6 ε
+q2 q3 ε
+q3 q2 ε
+q3 q8 1
+q4 q5 0
+q5 q3 ε
+q6 q7 1
+q7 q3 ε
+q8 q10 ε
+q8 q12 ε
+q9 q_f ε
+q10 q11 0
+q11 q9 ε
+q12 q13 1
+q13 q9 ε
+
+DFA:
+F2 F1 0
+F2 ​ 1
+​ F2 1
+F1 q1 0
+F1 q2 1
+S q1 0
+S q2 1
+q1 ‌ 0
+‌ q1 0
+q1 q2 1
+q2 F1 0
+q2 F2 1
