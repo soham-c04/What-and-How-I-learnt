@@ -27,12 +27,12 @@ Mostly this is for my future reference, if needed for some other project. Track 
 <details>
 <summary> </summary>
 
-### [<u>C</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C)
+### [<ins>C</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C)
 - **Projects:**
   - [Chat Server](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C/Chat%20Server)
   - [Snake Game](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C/Snake%20Game)
 
-### [<u>C++</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C++)
+### [<ins>C++</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C++)
 - [**Playlist**](https://www.youtube.com/playlist?list=PLu0W_9lII9agpFUAlPFe_VNSlXW5uE0YL)
 - **Projects:**
   - [VectorWolf](https://github.com/soham-c04/VectorWolf)
@@ -45,10 +45,10 @@ Mostly this is for my future reference, if needed for some other project. Track 
   - [SimpleScaler IPC Optimizer](https://github.com/soham-c04/SimpleScaler-IPC-optimizer)
 
 
-### [<u>Python</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Python)
+### [<ins>Python</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Python)
 - **Project:** [Gmail](https://github.com/soham-c04/Gmail)
 
-### [<u>Java</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Java)
+### [<ins>Java</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Java)
 - [**Playlist**](https://www.youtube.com/playlist?list=PLWKjhJtqVAbnRT_hue-3zyiuIYj0OlpyG)
 </details>
 <br><br>
@@ -66,17 +66,17 @@ Mostly this is for my future reference, if needed for some other project. Track 
 <details>
 <summary> </summary>
 
-### [<u>Machine Learning</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Machine%20Learning)
+### [<ins>Machine Learning</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Machine%20Learning)
 Jupyter Notebook and TensorFlow.
 Neural Networks.
 - **Websites (for materials/practice):**
 - **Videos:**
 - **Project:** [VectorWolf](https://github.com/soham-c04/VectorWolf)
 
-### <u>HTML/CSS</u>
+### <ins>HTML/CSS</ins>
 - [**Playlist**](https://www.youtube.com/playlist?list=PLWKjhJtqVAbnSe1qUNMG7AbPmjIG54u88)
 
-### <u>NodeJS</u>
+### <ins>NodeJS</ins>
 Along with using Postman and Supabase.
 - [**Playlist**](https://www.youtube.com/playlist?list=PLinedj3B30sDby4Al-i13hQJGQoRQDfPo)
 - **Project:** [Hospital](https://github.com/DebarghaNath/hospital) [Management](https://github.com/DebarghaNath/DBMS_PROJECT_HOSPITAL_MANAGMENT)
@@ -87,11 +87,11 @@ Along with using Postman and Supabase.
 <details>
 <summary> </summary>
 
-### [<u>Compiler Design</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Compiler%20Design)
+### [<ins>Compiler Design</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Compiler%20Design)
 7th Semester.
 - [**Playlist**](https://www.youtube.com/playlist?list=PLxCzCOWd7aiEKtKSIHYusizkESC42diyc)
 
-### [<u>Computer Networks</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Computer%20Networks)
+### [<ins>Computer Networks</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Computer%20Networks)
 6th Semester.<br>
 Advanced Computer Networks - 8th Semester.
 - [**Playlist**](http://youtube.com/playlist?list=PLxCzCOWd7aiGFBD2-2joCpWOLUrDLvVV_)
@@ -100,7 +100,7 @@ Advanced Computer Networks - 8th Semester.
   - [SAHAS Arcade](https://github.com/soham-c04/SAHAS-Arcade)
   - [Chat Server](https://github.com/soham-c04/Chat-Server-in-Cpp)
 
-### [<u>Computer Organization and Architecture</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Computer%20Organization%20and%20Architecture)
+### [<ins>Computer Organization and Architecture</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Computer%20Organization%20and%20Architecture)
 5th Semester.<br>
 Advanced Computer Organization and Architecture - 7th Semester.
 - [**Playlist**](https://www.youtube.com/playlist?list=PLxCzCOWd7aiHMonh3G6QNKq53C6oNXGrX) 
@@ -108,13 +108,13 @@ Advanced Computer Organization and Architecture - 7th Semester.
   - [CPU Design](https://github.com/soham-c04/CPU-Design-in-Cpp)
   - [SimpleScaler IPC Optimizer](https://github.com/soham-c04/SimpleScaler-IPC-optimizer)
 
-### [<u>Database Management System</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Database%20Management%20System)
+### [<ins>Database Management System</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Database%20Management%20System)
 6th Semester.
 - [**Playlist**](https://www.youtube.com/playlist?list=PLxCzCOWd7aiFAN6I8CuViBuCdJgiOkT2Y)
 - **Project:** [Hospital](https://github.com/DebarghaNath/hospital) [Management](https://github.com/DebarghaNath/DBMS_PROJECT_HOSPITAL_MANAGMENT)
 
 
-### [<u>Operating Systems</u>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Operating%20Systems)
+### [<ins>Operating Systems</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Operating%20Systems)
 5th Semester.
 - [**Playlist**](https://www.youtube.com/playlist?list=PLxCzCOWd7aiGz9donHRrE9I3Mwn6XdP8p)
 </details>
