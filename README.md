@@ -5,14 +5,14 @@ Mostly this is for my future reference, if needed for some other project. Track 
 ## Table of Contents
 - [**Programming Language**](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Programming-Language)
   - [C](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#C)
-  - [C++](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#C++)
+  - [C++](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#C-1)
   - [Python](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Python)
   - [Java](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Java)
   - [MATLAB](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/MATLAB)
 - [**Competitive Programming**](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Competitive-Programming)
 - [**Tech-Stack**](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Tech-Stack)
   - [Machine Learning](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Machine-Learning)
-  - [HTML/CSS](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#HTML/CSS)
+  - [HTML/CSS](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#HTML-CSS)
   - MySQL
   - [NodeJS](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#NodeJS)
 - [**Core**](https://github.com/soham-c04/What-and-How-I-learnt?tab=readme-ov-file#Core)
@@ -39,14 +39,16 @@ Mostly this is for my future reference, if needed for some other project. Track 
   - [SAHAS Arcade](https://github.com/soham-c04/SAHAS-Arcade)
   - [Soccer Stars](https://github.com/soham-c04/Soccer-Stars)
   - [CPU Design](https://github.com/soham-c04/CPU-Design-in-Cpp)
-  - [DStar_Lite](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C/DStar_Lite)
+  - [DStar_Lite](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/C%2B%2B/DStar_Lite)
   - [Chat Server](https://github.com/soham-c04/Chat-Server-in-Cpp)
   - [Moving Ball](https://github.com/soham-c04/Moving-Ball)
   - [SimpleScaler IPC Optimizer](https://github.com/soham-c04/SimpleScaler-IPC-optimizer)
-
+- [**Gomory-Hu Tree**](https://github.com/soham-c04/GomoryHu-Tree)
 
 ### [<ins>Python</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Python)
-- **Project:** [Gmail](https://github.com/soham-c04/Gmail)
+- **Projects:**
+  - [Gmail](https://github.com/soham-c04/Gmail)
+  - [Livechat](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Python/Livechat.py)
 
 ### [<ins>Java</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Java)
 - [**Playlist**](https://www.youtube.com/playlist?list=PLWKjhJtqVAbnRT_hue-3zyiuIYj0OlpyG)
@@ -57,8 +59,23 @@ Mostly this is for my future reference, if needed for some other project. Track 
 <details>
 <summary> </summary>
 
-- **Websites (for materials/practice):**
-- **Videos:**
+- **Playlists:**
+  - [luv Competitive Programming](https://www.youtube.com/playlist?list=PLauivoElc3ggagradg8MfOZreCMmXMmJ-)
+  - [Vivek Gupta](https://www.youtube.com/@vivekgupta3484/playlists)
+  - [Number Theory - Michael Penn](https://www.youtube.com/playlist?list=PL22w63XsKjqwn2V9CiP7cuSGv9plj71vv)
+  - [Second Thread](https://www.youtube.com/playlist?list=PLZU0kmvryb_HZpDW2yfn-H-RxAu_ts6xq)
+  - [Colin Galen](https://www.youtube.com/playlist?list=PLDjGkpToBsYCaRoQ-_S5MRxYMuKgHD62w)
+  - [Errichto](https://www.youtube.com/@Errichtohttps://www.youtube.com/playlist?list=PLg_Krngrs0eAiQkbMbKGm_Q0NKRSDFtZ4)
+  - [Priyansh Aggarwal](https://www.youtube.com/@PriyanshAgarwal/playlists)
+- **Websites:**
+  - [CP Algorithms](https://cp-algorithms.com/index.html)
+  - [USACO](https://usaco.guide/bronze/)
+  - [CSES](https://cses.fi/problemset/)
+  - [Project Euler](https://projecteuler.net/archives)
+  - [YouKnowWho Academy](https://youkn0wwho.academy/topic-list)
+  - [OI Wiki](https://oi-wiki.org/)
+  - [CLIST - Rating Predictor](https://clist.by/standings/?switch=on&resource=102)
+- [ICPC](https://github.com/IITBBS-ICPC/Template)
 </details>
 <br><br>
 
@@ -69,8 +86,12 @@ Mostly this is for my future reference, if needed for some other project. Track 
 ### [<ins>Machine Learning</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Machine%20Learning)
 Jupyter Notebook and TensorFlow.
 Neural Networks.
-- **Websites (for materials/practice):**
-- **Videos:**
+- [**Kaggle**](https://www.kaggle.com/sohamc04/code)
+- **Courses:**
+  - [Coursera - Machine Learning Specialization](https://www.coursera.org/specializations/machine-learning-introduction)
+  - [Udemy - Python for Data Science and Machine Learning Bootcamp](https://www.udemy.com/course/python-for-data-science-and-machine-learning-bootcamp/)
+  - [Udemy - TensorFlow for Deep Learning Bootcamp](https://www.udemy.com/course/tensorflow-developer-certificate-machine-learning-zero-to-mastery/)
+- [**Stanford CS229**](https://www.youtube.com/playlist?list=PLoROMvodv4rMiGQp3WXShtMGgzqpfVfbU) [Maths fundamentals for Neural Networks]
 - **Project:** [VectorWolf](https://github.com/soham-c04/VectorWolf)
 
 ### <ins>HTML/CSS</ins>
