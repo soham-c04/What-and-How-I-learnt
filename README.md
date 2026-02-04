@@ -43,7 +43,7 @@ Mostly this is for my future reference, if needed for some other project. Track 
   - [Chat Server](https://github.com/soham-c04/Chat-Server-in-Cpp)
   - [Moving Ball](https://github.com/soham-c04/Moving-Ball)
   - [SimpleScaler IPC Optimizer](https://github.com/soham-c04/SimpleScaler-IPC-optimizer)
-- [**Gomory-Hu Tree**](https://github.com/soham-c04/GomoryHu-Tree)
+- [**Gomory-Hu Tree**](https://github.com/soham-c04/Gomory-Hu-Tree)
 
 ### [<ins>Python</ins>](https://github.com/soham-c04/What-and-How-I-learnt/tree/main/Python)
 - **Projects:**
