@@ -4,9 +4,6 @@ import java.util.Scanner;
 import java.util.Vector;
 
 class Room{
-
-}
-class Room{
     private int ID;
     protected Room(int ID){
         this.ID = ID;

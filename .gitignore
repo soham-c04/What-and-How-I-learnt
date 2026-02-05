@@ -1,0 +1,16 @@
+# Executables
+*.exe
+*.out
+*.iml
+
+# Stress Test Temporary Files
+brute
+code
+gen
+input_file
+myAnswer
+correctAnswer
+
+# Windows
+.vscode/
+.idea/

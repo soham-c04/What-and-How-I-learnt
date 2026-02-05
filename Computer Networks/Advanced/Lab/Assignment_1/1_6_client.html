@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="Name" content="Soham Chakraborty">
+        <meta name="Roll No." content="22CS02002">
+        <meta name="Branch" content="CSE Dual Degree">
+        <meta name="Semester" content="8">
+        <link rel="icon" href="logo_iit_bbs.png" type="image/x-icon">
+        <title>Assignment 1.6</title>
+    </head>
+
+    <body>
+        <h1>Student WebSocket Service</h1>
+
+        <input id="cmd" placeholder="PRINT .* or COUNT .*" />
+        <button id="send">Send</button>
+
+        <div id="out">
+            <ul id="list"></ul>
+        </div>
+
+        <script>
+            const ws = new WebSocket("ws://localhost:2020");
+
+            const input = document.getElementById('cmd');
+            const sendBtn = document.getElementById('send');
+            const list = document.getElementById('list');
+
+            ws.onmessage = (ev) => {
+                const text = ev.data;
+                const lines = text.trim().split('\n').filter(l => l.length > 0);
+
+                list.innerHTML = '';
+                lines.forEach(line => {
+                const li = document.createElement('li');
+                li.textContent = line;
+                list.appendChild(li);
+                });
+            };
+
+            sendBtn.addEventListener('click', () => {
+                const msg = input.value.trim();
+                if (!msg) return;
+                ws.send(msg);
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') sendBtn.click();
+            });
+        </script>
+    </body>
+</html>
