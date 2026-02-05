@@ -1,8 +1,8 @@
 #! /bin/bash
 set -e
-g++ code.cpp -o code
-g++ gen.cpp -o gen
-g++ brute.cpp -o brute
+g++ -std=c++20 -O3 code.cpp -o code
+g++ -std=c++20 -O3 gen.cpp -o gen
+g++ -std=c++20 -O3 brute.cpp -o brute
 for((i = 1; ; ++i)); do
     ./gen $i > input_file
     ./code < input_file > myAnswer
