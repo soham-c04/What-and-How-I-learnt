@@ -1,0 +1,35 @@
+string Read(int client_fd){             // Reading from a Single Specified Peer(neighbor), given the client_fd.
+    char data[BUFFER+1];
+    memset(data, 0, sizeof(data));
+    int n = read(client_fd, data, sizeof(data));
+    if(n<=0){
+        error("Improper Read - " + to_string(n));
+        return "";
+    }
+    data[n]='\0';
+    // debug("Read: " + string(data) + " ("+to_string(client_fd)+")");
+    return string(data);
+}
+
+bool ClientRead(int client_fd){
+    string msg = Read(client_fd);
+    Message request(msg);
+    if(seen_messages.find(request.id) != seen_messages.end()){      // Already seen this message. Similar to visited array in DFS.
+        // debug("Seen - "+to_string(request.id));
+        return true;  
+    }
+    seen_messages.insert(request.id);
+
+    // debug("ClientRead: " + msg);
+    
+    bool keep = true;
+    request.ttl--;                                                          // Reduce hop limit by 1 after each Read();
+    if(request.destination == my) peer[ID[{request.source.ip, request.source.port}]].print(request.payload, true); // Message reached its destination.
+    else{
+        if(request.isNewConnection()) readNewConnection(request);                        // New Client connected
+        else if(request.isNewDisconnection()) keep = readNewDisconnection(request, client_fd);    // Client disconnected
+        else if(request.isBroadcast()) peer[ID[{request.source.ip, request.source.port}]].print(request.payload);  // General Broadcasted messages
+        if(request.ttl > 0) forward(request, client_fd);                                            // Keep Forwarding.
+    }
+    return keep;
+}

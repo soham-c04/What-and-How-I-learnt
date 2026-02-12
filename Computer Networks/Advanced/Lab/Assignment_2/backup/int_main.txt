@@ -1,0 +1,47 @@
+int main(int argc, char *argv[]){
+    srand(time(NULL));
+
+    if((argc>2) && (argv[2][0]=='1')) DEBUG = true;    // debug() enabled only if a third compile time argument = 1 is given.
+    else if(argc < 2) error("No port provided",true);
+    int port = atoi(argv[1]);
+
+    start_server(port);
+    setup_fd();
+
+    help();
+
+    while(true){
+        fd_set readset = all_neighbors;
+        // Returns the set of currently ready to read clients / user-input / connections
+        int ready = select(max_fd+1, &readset, NULL, NULL, NULL);
+        if(ready < 0) error("Select - " + to_string(ready)); 
+        
+        if(FD_ISSET(STDIN, &readset)){
+            // debug("Input Ready");
+            if(!Command()) break;
+        }
+        if(FD_ISSET(my_fd, &readset)){
+            // debug("Connection Ready");
+            Accept();
+        }
+
+        vector<int> disconnected_clients;
+        for(int client_fd: neighbor_fds){
+            if(!FD_ISSET(client_fd, &readset)) continue;                            // Client has nothing to send.
+            // debug("Client Ready");
+            if(!ClientRead(client_fd)) disconnected_clients.push_back(client_fd);   // Client got disconnected.
+        }
+
+        if(ready){
+            // debug("Ready - " + to_string(ready));
+            cout<<"\nYou: ";
+            cout.flush();
+        }
+
+        for(int fd:disconnected_clients) remove_neighbor(fd);
+    }
+    
+    close(my_fd);
+
+    return 0;
+}

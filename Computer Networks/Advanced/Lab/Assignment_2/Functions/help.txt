@@ -1,0 +1,21 @@
+void help(){
+    cout<<"\nAvailable commands:"<<endl;
+    cout<<" /help                       - Show this message"<<endl;
+    cout<<" /list                       - List connected peers"<<endl;
+    cout<<" /list neighbors             - List of neighbors"<<endl;
+    cout<<" /connect <IP> <port>        - Connect to a peer"<<endl;
+    cout<<" /msg <ID> <message>         - Send private message to peer"<<endl;
+    cout<<" /broadcast <message>        - Broadcast message to all peers"<<endl;
+    cout<<" /allfiles [path] [regex]    - List all LOCAL files in given (relative)path [current path by default] and satisfying regex"<<endl;
+    cout<<" /addfile <filename>         - Add a certian file to yourself (if it doesn't belong to someone else)"<<endl;
+    cout<<" /myfiles [regex]            - Show List of my_files satisfying regex"<<endl;
+    cout<<" /readfile <filename>        - Read a file. Can be opened only if you have access."<<endl;
+    cout<<" /search [regex]             - Search for all GLOBAL files (which belong to someone) satisfying regex"<<endl;
+    cout<<" /request <filename>         - Request for a certain file"<<endl;
+    cout<<" /send <ID> <filename>       - Send file to someone"<<endl;
+    cout<<" /exit                       - Show this message"<<endl;
+    cout<<" /broadcast is done by default is no command is mentioned"<<endl;
+    cout<<"\nTo send a public message, just type and press enter"<<endl;
+    cout<<"Important:- There is a 1 second timeout before each Send()"<<endl;
+    cout<<"Only *.txt files will be considered"<<endl;
+}

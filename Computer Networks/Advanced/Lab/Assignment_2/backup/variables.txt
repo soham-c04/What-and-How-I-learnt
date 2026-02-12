@@ -1,0 +1,22 @@
+void error(const string err, bool close=false){
+    cout<<"\nError: "<<err<<endl;
+    if(close) exit(1);
+}
+ 
+bool DEBUG = false;
+void debug(const string s){
+    if(DEBUG) cout<<"\nDEBUG - [   "<<s<<"   ]"<<endl;  
+}
+
+const int STDIN = 0;            // Non-blocking user-input via keyboard.
+const int BUFFER = 1024;
+const int TTL = 10;
+
+int my_fd, max_fd;
+fd_set all_neighbors;           // Set of all peers with whom I am directly connected to.
+vector<int> neighbor_fds;       // Better Efficiency - while iterating through FD_ISSET().
+set<int> seen_messages;         // To prevent forever looping of a message (Temporary cache)
+
+vector<Peer> peer;              // Set of all Peers (Irrespective of whether I am directly connected to them or not).
+map<pair<string,int>, int> ID;  // Maps <ip, port> pair to uniqueID of Peer (different from each Peer POV). Generates a new ID for each new Peer
+#define my peer[0]

@@ -1,0 +1,16 @@
+void castNewDisconnection(){
+    string payload = "";
+    msg("-2", payload);
+}
+
+bool readNewDisconnection(Message &req, int client_fd){                 // Don't do ID.erase() or peers.erase().
+    auto it = ID.find({req.source.ip, req.source.port});
+    if(it == ID.end()) return true;
+    int id = it->second;
+    if((peer[id].sockfd == client_fd) && (peer[id] == req.source)){     // Peer who disconnected was a neighbor to me.
+        peer[id].disconnected();
+        return false;
+    }
+    peer[id].disconnected();
+    return true;
+}

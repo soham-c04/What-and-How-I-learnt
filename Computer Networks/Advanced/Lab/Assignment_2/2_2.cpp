@@ -1,14 +1,11 @@
 #include <bits/stdc++.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <regex.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 using namespace std;
-
-/*
-Videos referred for select():-
-1. https://www.youtube.com/watch?v=oD94jnuOHLM
-2. https://www.youtube.com/watch?v=dEHZb9JsmOU
-3. https://www.youtube.com/watch?v=TE5m12TeC3Q&list=PLag72r_KE8xfCHwFIgmDlj-emBE8hDGZo&index=16
-*/
 
 void error(const string err, bool close=false){
     cout<<"\nError: "<<err<<endl;
@@ -21,7 +18,7 @@ void debug(const string s){
 }
 
 const int STDIN = 0;            // Non-blocking user-input via keyboard.
-const int BUFFER = 1024;
+const int BUFFER = 32768;
 const int TTL = 10;
 
 int my_fd, max_fd;
@@ -101,13 +98,16 @@ struct Peer{
 };
 vector<Peer> peer;              // Set of all Peers (Irrespective of whether I am directly connected to them or not).
 map<pair<string,int>, int> ID;  // Maps <ip, port> pair to uniqueID of Peer (different from each Peer POV). Generates a new ID for each new Peer
-#define my peer[0]
+#define my peer[0]              // My details
+#define my_path ("myfiles-" + my.ip + "-" + to_string(my.port))     // Folder where I'm storing my files
+const string PATH = "Functions";// Default path where Local files are stored
 
 struct Message{
     int id;
-    int ttl;
     Peer source;
     Peer destination;
+    int ttl;
+    int type;
     string payload;
     
     Message(string &s){                 // Decode input string into parts
@@ -118,16 +118,17 @@ struct Message{
             return;
         }
         stringstream ss(s);
-        string ID, ttl1, sp, dp;
+        string ID, ttl1, sp, dp, tp;
         getline(ss, ID, '|');
         getline(ss, source.ip, '|');
         getline(ss, sp, '|');
         getline(ss, destination.ip, '|');
         getline(ss, dp, '|');
         getline(ss, ttl1, '|');
+        getline(ss, tp, '|');
         getline(ss, payload, '\0');
 
-        // debug("Message - " + ID + " , " + source.ip + " , " + sp + " , " + destination.ip + " , " + dp + " , " + ttl1 + " , " + payload);  
+        // debug("Message - " + ID + " , " + source.ip + " , " + sp + " , " + destination.ip + " , " + dp + " , " + ttl1 + " , " + tp + " , " + payload);  
 
         try{
             id = stoi(ID);
@@ -153,32 +154,143 @@ struct Message{
         catch(const invalid_argument &e){
             error("Desination port should be an integer - " + dp);
         }
+        try{
+            type = stoi(tp);
+        }
+        catch(const invalid_argument &e){
+            error("Message Type should be an integer - " + dp);
+        }
     }
 
-    Message(int i, string &payload){    // Message is created for the first time
+    Message(string &payload, int type, int i=-1){    // Message is created for the first time
         id = (int32_t)((uint32_t)rand() | ((uint32_t)rand() << 15) | ((uint32_t)rand() << 30) | my.port);
-        ttl = TTL;
         source = my;
-        if(i>0) destination = peer[i];  // Private msg
-        else{                           // Broadcast
+        if(type>=0) destination = peer[i];  // Private msg
+        else{                               // Broadcast
             destination.ip.clear();
-            destination.port = i;
+            destination.port = 0;
         }
-
+        ttl = TTL;
+        this->type = type;
         this->payload = payload;
 
         seen_messages.insert(id);
     }
 
     string encode(){                    // Encode Message back into string
-        string encoded = to_string(id) + "|" + source.ip + "|" + to_string(source.port) + "|" + destination.ip + "|" + to_string(destination.port) + "|" + to_string(ttl) + "|" + payload;
+        string encoded = to_string(id) + "|" + source.ip + "|" + to_string(source.port) + "|" + destination.ip + "|" + to_string(destination.port) + "|" + to_string(ttl) + "|" + to_string(type) + "|" + payload;
         return encoded;
     }
 
-    bool isBroadcast(){ return destination.ip.empty(); }
-    bool isNewConnection(){ return isBroadcast() && (destination.port==-1); }
-    bool isNewDisconnection(){ return isBroadcast() && (destination.port==-2); }
+    bool isSearch(){ return type == -4; }              // O(n^2) - More optimal possible ?
+    bool isNewDisconnection(){ return type == -3; }
+    bool isNewConnection(){ return type == -2; }
+    bool isBroadcast(){ return type==-1; }
+    bool isPrivate(){ return type >= 0; }
+    bool isSearchReply(){ return type == 1; }
+    bool isRequest(){ return type == 2; }
+    bool isSendFile(){ return type == 3; }
 };
+
+struct File{
+    string filename;
+
+    static int readOwners(const string &name){
+        ifstream in(PATH + "/" + name + ".owners");
+        int count = 0;
+        if (in >> count) return count;
+        return 0;                                           // .owners doesn't exist
+    }
+
+    static int checkAccess(const string &name);
+
+    void updateOwners(int updatedCount){
+        string path = PATH + "/" + filename + ".owners";
+        if(updatedCount <= 0){
+            if(remove(path.c_str())){         // If no owners then delete
+                error("Removing file (updateOwners) - " + path);
+            }
+        }
+        else{
+            ofstream out(path);                             // .owners is created if previously didn't exist
+            if(out) out << updatedCount << '\n';
+            else error("Opening file (updateOwners) - " + path);
+        }
+    }
+
+    string open(string path = my_path){
+        ifstream in(path + "/" + filename + ".txt");
+        if(!in){
+            error("Opening file - " + path + "/" + filename + ".txt");
+            return "";
+        }
+        ostringstream ss;
+        ss << in.rdbuf();
+        string contents = ss.str();
+        return contents;
+    }
+
+    File(string &name){                                     // You are the first owner of file.
+        filename = name;
+        ofstream out(my_path + "/" + filename + ".txt");    // Copy to myfiles
+        string contents = open(PATH);
+        if(out && (!contents.empty())){
+            out << contents;  
+            updateOwners(readOwners(filename) + 1);
+        }
+        else error("Copying file to myfiles");
+    }
+
+    File(string &name, string &contents){                   // You are creating a file after copying from someone else.
+        filename = name;
+        ofstream out(my_path + "/" + filename + ".txt");    // Copy to myfiles
+        if(out){
+            out << contents;  
+            int owners = readOwners(filename);
+            if(owners > 0) updateOwners(owners + 1);
+        }
+        else error("Copying file to myfiles");
+    }
+
+    void Send(string &id);
+
+    void Remove(){
+        updateOwners(readOwners(filename) - 1);
+        if(remove((my_path + "/" + filename + ".txt").c_str())) error("Removing file from myfiles");
+    }
+};
+vector<File> myFiles;                                       // List of current files that I have.
+
+int File::checkAccess(const string &name){
+    for(File &f:myFiles){
+        if(f.filename == name){
+            cout<<"\nYou already have the file"<<endl;
+            return 2;                                       // I already have the file
+        }
+    }
+    ifstream f(PATH + "/" + name + ".txt");
+    if(f){
+        if(readOwners(name)>0){
+            cout<<"\nThis is a private file.\nUse /request <ID> <filename> to request for file access from owner(s)"<<endl;
+            return 0;                                       // Someone has the file. You need permission.
+        }
+        return 1;                                           // You have access to the file
+    }
+    else{
+        cout<<"\nFile not Found"<<endl;
+        return -1;                                          // File not Found
+    }
+}
+
+bool match(const string &text, string &pattern) {           // Regex Matching code
+    if(pattern.empty()) pattern = ".*";
+    regex_t re;
+    if (regcomp(&re, pattern.c_str(), REG_EXTENDED | REG_NOSUB) != 0) return false;
+
+    int result = regexec(&re, text.c_str(), 0, NULL, 0);
+    regfree(&re);
+    return result == 0;
+}
 
 void add_neighbor(int sockfd){          // New Peer added to set of neighbors
     FD_SET(sockfd, &all_neighbors);
@@ -206,7 +318,7 @@ string Read(int client_fd){             // Reading from a Single Specified Peer(
     return string(data);
 }
 
-bool Send(int sockfd,const string &message){                     // Sending to a Single Specified Peer (neighbor), given the sockfd.
+bool Send(int sockfd,const string &message){                // Sending to a Single Specified Peer (neighbor), given the sockfd.
     ssize_t n = write(sockfd, message.c_str(), message.size()); 
     if(n < 0){
         error("Writing to socket - " + to_string(sockfd));
@@ -236,18 +348,27 @@ void forward(Message &msg, int parent=-1){                  // Compelete floodin
 
 void help(){
     cout<<"\nAvailable commands:"<<endl;
-    cout<<" /help                   - Show this message"<<endl;
-    cout<<" /list                   - List connected peers"<<endl;
-    cout<<" /list neighbors         - List of neighbors"<<endl;
-    cout<<" /connect <IP> <port>    - Connect to a peer"<<endl;
-    cout<<" /msg <ID> <message>     - Send private message to peer"<<endl;
-    cout<<" /broadcast <message>    - Broadcast message to all peers"<<endl;
-    cout<<" /exit                   - Show this message"<<endl;
+    // Assignment 2 Part 1 - P2P Chat Group
+    cout<<" /help                       - Show this message"<<endl;
+    cout<<" /list                       - List connected peers"<<endl;
+    cout<<" /list neighbors             - List of neighbors"<<endl;
+    cout<<" /connect <IP> <port>        - Connect to a peer"<<endl;
+    cout<<" /msg <ID> <message>         - Send private message to peer"<<endl;
+    cout<<" /broadcast <message>        - Broadcast message to all peers"<<endl;
+    // Assignment 2 Part 2 - P2P File Sharing
+    cout<<" /allfiles [regex]           - List all LOCAL files in \"Functions/\" and satisfying regex"<<endl;
+    cout<<" /addfile <filename>         - Add an available file (Use ../path/filename for some other location)"<<endl;
+    cout<<" /removefile <filename>      - Remove a file"<<endl;
+    cout<<" /myfiles [regex]            - Show all myFiles satisfying regex"<<endl;
+    cout<<" /readfile <filename>        - Read a file. Can be opened only if you have access."<<endl;
+    cout<<" /search [regex]             - Search for all GLOBAL files (which belong to someone) satisfying regex"<<endl;
+    cout<<" /request <ID> <filename>    - Request file from someone"<<endl;
+    cout<<" /sendfile <ID> <filename>   - Send file to someone"<<endl;
+    cout<<" /exit                       - Show this message"<<endl;
     cout<<" /broadcast is done by default is no command is mentioned"<<endl;
     cout<<"\nTo send a public message, just type and press enter"<<endl;
-    cout<<"\nImportant:- There is a 1 second timeout before each Send()"<<endl;
-    cout<<"\nYou: ";
-    cout.flush();
+    cout<<"Important:- There is a 1 second timeout before each Send()"<<endl;
+    cout<<"Only *.txt files will be considered"<<endl;
 }
 
 void List(bool neighbors_only){
@@ -270,7 +391,7 @@ void List(bool neighbors_only){
     cout<<endl;
 }
 
-void msg(const string &destination_ID, string &payload){    // Flooding when ID is given
+void msg(string &payload, int type, const string &destination_ID="-1"){    // Flooding when ID is given
     int destination_id;
     try{
         destination_id = stoi(destination_ID);
@@ -285,18 +406,14 @@ void msg(const string &destination_ID, string &payload){    // Flooding when ID 
         return;
     }
 
-    Message message(destination_id, payload);
+    Message message(payload, type, destination_id);
     forward(message);
 }
-
-// I could've handled NewConnection, Disconnection and Broadcast inside a single request.process(client_fd), but it didn't look good.
-// How to handle deletions at articulations points ?
-// sync_state
 
 void castNewConnection(int sockfd){
     string payload;
     for(Peer &p:peer) payload += p.encode();
-    Message announce(-1, payload);
+    Message announce(payload, -2);
     string message = announce.encode();
     Send(sockfd, message);
 }
@@ -308,7 +425,7 @@ void readNewConnection(Message &req){
         if(!getline(ss, ip, '#')) break;
         if(!getline(ss, port, '#')) break;
         if(!getline(ss, name, '\n')) break;
-        debug("New Connection - " + ip + " , " + port + " , " + name);
+        // debug("New Connection - " + ip + " , " + port + " , " + name);
         int portno;
         try{
             portno = stoi(port);
@@ -329,23 +446,6 @@ void readNewConnection(Message &req){
             peer[id].name = name;
         }
     }
-}
-
-void castNewDisconnection(){
-    string payload = "";
-    msg("-2", payload);
-}
-
-bool readNewDisconnection(Message &req, int client_fd){                 // Don't do ID.erase() or peers.erase().
-    auto it = ID.find({req.source.ip, req.source.port});
-    if(it == ID.end()) return true;
-    int id = it->second;
-    if((peer[id].sockfd == client_fd) && (peer[id] == req.source)){     // Peer who disconnected was a neighbor to me.
-        peer[id].disconnected();
-        return false;
-    }
-    peer[id].disconnected();
-    return true;
 }
 
 void Connect(string &IP, string &serv_port){
@@ -390,7 +490,7 @@ void Connect(string &IP, string &serv_port){
     Send(sockfd, my.encode());
     sleep(1);
     string name = Read(sockfd);
-    debug("Listen - " + name);
+    // debug("Listen - " + name);
     auto it = ID.find({IP, portno});
     if(it == ID.end()){                                     
         int id = ID[{IP, portno}] = ID.size();
@@ -413,7 +513,7 @@ void Accept(){
         string s = Read(client_fd);
         sleep(1);
         Send(client_fd, my.name);
-        debug("Accept - " + s);
+        // debug("Accept - " + s);
         auto [ip, portno, name] = Peer::decode(s);
         auto it = ID.find({ip, portno});
         if(it == ID.end()){                                     
@@ -430,6 +530,64 @@ void Accept(){
     }
 }
 
+void castNewDisconnection(){
+    string payload = "";
+    msg(payload, -3);
+}
+
+// How to handle deletions at articulations points ?
+// /sync_state
+
+bool readNewDisconnection(Message &req, int client_fd){     // Don't do ID.erase() or peers.erase().
+    auto it = ID.find({req.source.ip, req.source.port});
+    if(it == ID.end()) return true;
+    int id = it->second;
+    if((peer[id].sockfd == client_fd) && (peer[id] == req.source)){     // Peer who disconnected was a neighbor to me.
+        peer[id].disconnected();
+        return false;
+    }
+    peer[id].disconnected();
+    return true;
+}
+
+void readSearch(Message &req){
+    auto it = ID.find({req.source.ip, req.source.port});
+    if(it == ID.end()) cout << "\nSender is not in your List for some reason"<<endl;
+    else{
+        string reply = "";
+        for(File &f:myFiles){
+            if(match(f.filename, req.payload)) reply += f.filename + "\n";
+        }
+        string id = to_string(it->second);
+        if(reply.size()) msg(reply, 1, id);
+    }
+}
+
+void readSearchReply(string &filenames, int id){
+    stringstream ss(filenames);
+    string filename;
+    cout<<endl;
+    while(getline(ss, filename)) printf("- %s by %s(%d)\n", filename.c_str(), peer[id].name.c_str(), id);
+    fflush(stdout);
+}
+
+void readRequest(string &filename, int id){
+    printf("\n-> %s(%d) requested for file - %s\n", peer[id].name.c_str(), id, filename.c_str());
+    fflush(stdout);
+}
+
+void readSendFile(string &payload, int id){
+    stringstream ss(payload);
+    string filename, contents;
+    if(!getline(ss, filename, '#')) cout<<"\nReceived Filename not found"<<endl;
+    else if(!getline(ss, contents, '\0')) cout<<"\nReceived File is empty"<<endl;
+    else{
+        printf("\n-> %s(%d) sent file - %s\n", peer[id].name.c_str(), id, filename.c_str());
+        fflush(stdout);
+        myFiles.push_back(File(filename, contents));
+    }
+}
+
 bool ClientRead(int client_fd){
     string msg = Read(client_fd);
     Message request(msg);
@@ -441,16 +599,125 @@ bool ClientRead(int client_fd){
 
     // debug("ClientRead: " + msg);
     
-    bool keep = true;
-    request.ttl--;                                                          // Reduce hop limit by 1 after each Read();
-    if(request.destination == my) peer[ID[{request.source.ip, request.source.port}]].print(request.payload, true); // Message reached its destination.
+    bool keep = true;                                               // returns false if client is Disconnected  
+    if(request.destination == my){                                  // Message reached its fixed destination.
+        auto it = ID.find({request.source.ip, request.source.port});
+        if(it == ID.end()){
+            cout << "\nSender is not in your List for some reason"<<endl;
+            return true;
+        }
+        int id = it->second;
+        if(request.isSearchReply()) readSearchReply(request.payload, id);
+        else if(request.isRequest()) readRequest(request.payload, id);
+        else if(request.isSendFile()) readSendFile(request.payload, id);
+        else peer[ID[{request.source.ip, request.source.port}]].print(request.payload, true);       // General private message
+    }
     else{
-        if(request.isNewConnection()) readNewConnection(request);                        // New Client connected
-        else if(request.isNewDisconnection()) keep = readNewDisconnection(request, client_fd);    // Client disconnected
-        else if(request.isBroadcast()) peer[ID[{request.source.ip, request.source.port}]].print(request.payload);  // General Broadcasted messages
+        if(request.isBroadcast()) peer[ID[{request.source.ip, request.source.port}]].print(request.payload);    // General Broadcasted message
+        else if(request.isNewConnection()) readNewConnection(request);                              // New Client connected
+        else if(request.isNewDisconnection()) keep = readNewDisconnection(request, client_fd);      // Client disconnected
+        else if(request.isSearch()) readSearch(request);
+        
+        request.ttl--;                                                                              // Reduce hop limit by 1 after each Read();
         if(request.ttl > 0) forward(request, client_fd);                                            // Keep Forwarding.
     }
     return keep;
+}
+
+// File Sharing START
+
+void allfiles(string &regex){
+    DIR *dir = opendir(PATH.c_str());
+    if (!dir) {
+        error("Directory - " + PATH + " doesn't exist");
+        return;
+    }
+
+    cout<<"\nAvailable Files - "<<endl;
+    int count = 0;
+    struct dirent *entry;
+    while((entry = readdir(dir)) != nullptr){
+        if (entry->d_type != DT_REG) continue;      // Don't consider if not a regular file
+
+        string filename = entry->d_name;
+        if (filename.size() < 4 || filename.substr(filename.size() - 4) != ".txt") continue;    // Consider only .txt files
+        
+        if(match(filename, regex)) cout << (++count) << ". " << filename << endl;
+    }
+    if(!count) cout<<"No files here"<<endl;
+
+    closedir(dir);
+}
+
+void addfile(string &filename){
+    if(File::checkAccess(filename) == 1){
+        myFiles.push_back(File(filename));
+        cout<<"\n"<<filename<<" was added to List"<<endl;
+    }
+}
+
+void removefile(string &filename){
+    for (auto it = myFiles.begin(); it != myFiles.end(); ++it) {
+        if (it->filename == filename) {
+            it->Remove();
+            myFiles.erase(it);
+            return;
+        }
+    }
+}
+
+void myfiles(string &regex){
+    cout<<"\nYour Files:- "<<endl;
+    int count = 0;
+    for(File &f:myFiles){
+        if(match(f.filename, regex)){
+            cout<<(++count)<<". "<<f.filename<<endl;
+        }
+    }
+    if(!count) cout<<"You have no files matching given regex.\nUse /addfile or /request to get files."<<endl;
+}
+
+void readfile(string &filename){
+    for(File &f:myFiles){
+        if(f.filename == filename){
+            cout<<endl<<f.open()<<endl;
+            return;
+        }
+    }
+    cout<<"\nYou don't have access to this file.\nUse /addfile or /request to get the file."<<endl;
+}
+
+void search(string &regex){
+    msg(regex, -4);
+    cout<<"\nSearch Results:-"<<endl;
+}
+
+void request(string &id, string &filename){
+    msg(filename, 2, id);
+}
+
+void File::Send(string &id){
+    string payload = filename + "#" + open();
+    msg(payload, 3, id);
+}
+
+void sendfile(string &id, string &filename){
+    debug("sendfile - " + id + " , " + filename);
+    for(File &f:myFiles){
+        if(f.filename == filename){
+            f.Send(id);
+            return;
+        }
+    }
+    cout<<"\nYou don't have access to this file.\nUse /addfile or /request to get the file."<<endl;
+}
+
+// File Sharing END
+
+void Exit(){
+    castNewDisconnection();                                 // Announce to everyone that you disconnected
+    for(File &f:myFiles) f.Remove();                        // Remove 1 from .owners of all files
+    if(rmdir(my_path.c_str())) error("Deleting myfiles");   // Deleting myfiles after program ends
 }
 
 bool Command(){
@@ -460,23 +727,54 @@ bool Command(){
     // Divide input comamnd into parts
     string command,x,y;
     istringstream iss(input);
-    iss>>command;
-    iss>>x;
-    getline(iss, y);
+    iss>>command>>x;
+    getline(iss>>ws, y);            // Consumes extra whitespace
 
+    // Chat Commands
     if(command=="/help") help();
     else if(command=="/list") List(x=="neighbors");
     else if(command=="/connect") Connect(x,y);
-    else if(command=="/msg") msg(x,y);
+    else if(command=="/msg") msg(y, 0, x);
     else if(command=="/broadcast"){
         x+=y;
-        msg("0", x);
+        msg(x, -1);
     }
-    else if(command=="/exit"){
-        castNewDisconnection();     // Announce to everyone that you disconnected
-        return false;               // Exit program
+    else if(command=="/exit") {
+        Exit();
+        return false;                               // Exit program
     }
-    else msg("0", input);           // Broadcast by default
+    // File Sharing
+    else if(command == "/allfiles"){
+        x += y;
+        allfiles(x);
+    }
+    else if(command == "/addfile"){
+        x += y;
+        addfile(x);
+    }
+    else if(command == "/removefile"){
+        x += y;
+        removefile(x);
+    }
+    else if(command == "/myfiles"){
+        x += y;
+        myfiles(x);
+    }
+    else if(command == "/allfiles"){
+        x += y;
+        allfiles(x);
+    }
+    else if(command == "/readfile"){
+        x += y;
+        readfile(x);
+    }
+    else if(command == "/search"){
+        x += y;
+        search(x);
+    }
+    else if(command == "/request") request(x,y);
+    else if(command == "/sendfile") sendfile(x,y);
+    else msg(input, -1);                           // Broadcast by default
 
     return true;
 }
@@ -527,7 +825,11 @@ int main(int argc, char *argv[]){
     start_server(port);
     setup_fd();
 
+    if(mkdir(my_path.c_str(), 0755)) error("Creating myfiles", true);      // Create myfiles-<>-<> directory
+    
     help();
+    cout<<"\nYou: ";
+    fflush(stdout);
 
     while(true){
         fd_set readset = all_neighbors;
@@ -541,6 +843,7 @@ int main(int argc, char *argv[]){
         }
         if(FD_ISSET(my_fd, &readset)){
             // debug("Connection Ready");
+            ready--;
             Accept();
         }
 

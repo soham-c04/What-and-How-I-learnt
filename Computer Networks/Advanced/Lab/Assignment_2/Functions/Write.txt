@@ -1,0 +1,46 @@
+bool Send(int sockfd,const string &message){                     // Sending to a Single Specified Peer (neighbor), given the sockfd.
+    ssize_t n = write(sockfd, message.c_str(), message.size()); 
+    if(n < 0){
+        error("Writing to socket - " + to_string(sockfd));
+        debug("Return value - " + to_string(n));
+        return false;
+    }
+    // debug("Write: " + message + " ("+to_string(sockfd)+")");
+    sleep(1);
+    return true;
+}
+
+void forward(Message &msg, int parent=-1){                  // Compelete flooding to reach destination
+    string message = msg.encode();
+    // Check if destination is a neighbor
+    for(Peer &p:peer){
+        if((p.sockfd!=-1) && (p.sockfd!=parent) && (msg.destination == p)){       // Condition for neighbor is the destination
+            if(Send(p.sockfd, message)) return;
+        }
+    }
+
+    for(int fd:neighbor_fds){
+        if(fd!=parent){
+            Send(fd, message);
+        }
+    }
+}
+
+void msg(const string &destination_ID, string &payload){    // Flooding when ID is given
+    int destination_id;
+    try{
+        destination_id = stoi(destination_ID);
+    }
+    catch(const invalid_argument &e){
+        error("Peer ID should be an integer - " + destination_ID);
+        return;
+    }
+    if(destination_id >= (int)peer.size()){
+        error("Invalid Destination id (out of bounds) - " + to_string(destination_id));
+        debug("ID = " + destination_ID + "  >=  #peers = " + to_string(peer.size()));
+        return;
+    }
+
+    Message message(destination_id, payload);
+    forward(message);
+}

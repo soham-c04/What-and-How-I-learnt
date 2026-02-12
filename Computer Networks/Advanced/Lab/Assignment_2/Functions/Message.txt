@@ -1,0 +1,76 @@
+struct Message{
+    int id;
+    int ttl;
+    Peer source;
+    Peer destination;
+    string payload;
+    
+    Message(string &s){                 // Decode input string into parts
+        if(s.empty()){
+            id = 0;
+            seen_messages.insert(0);
+            debug("Message - Empty String");
+            return;
+        }
+        stringstream ss(s);
+        string ID, ttl1, sp, dp;
+        getline(ss, ID, '|');
+        getline(ss, source.ip, '|');
+        getline(ss, sp, '|');
+        getline(ss, destination.ip, '|');
+        getline(ss, dp, '|');
+        getline(ss, ttl1, '|');
+        getline(ss, payload, '\0');
+
+        // debug("Message - " + ID + " , " + source.ip + " , " + sp + " , " + destination.ip + " , " + dp + " , " + ttl1 + " , " + payload);  
+
+        try{
+            id = stoi(ID);
+        }
+        catch(const invalid_argument &e){
+            error("Message_id should be integer - " + ID, true);
+        }
+        try{
+            ttl = stoi(ttl1);
+        }
+        catch(const invalid_argument &e){
+            error("TTL should be an integer - " + ttl, true);
+        }
+        try{
+            source.port = stoi(sp);
+        }
+        catch(const invalid_argument &e){
+            error("Source port should be an integer - " + sp);
+        }
+        try{
+            destination.port = stoi(dp);
+        }
+        catch(const invalid_argument &e){
+            error("Desination port should be an integer - " + dp);
+        }
+    }
+
+    Message(int i, string &payload){    // Message is created for the first time
+        id = (int32_t)((uint32_t)rand() | ((uint32_t)rand() << 15) | ((uint32_t)rand() << 30) | my.port);
+        ttl = TTL;
+        source = my;
+        if(i>0) destination = peer[i];  // Private msg
+        else{                           // Broadcast
+            destination.ip.clear();
+            destination.port = i;
+        }
+
+        this->payload = payload;
+
+        seen_messages.insert(id);
+    }
+
+    string encode(){                    // Encode Message back into string
+        string encoded = to_string(id) + "|" + source.ip + "|" + to_string(source.port) + "|" + destination.ip + "|" + to_string(destination.port) + "|" + to_string(ttl) + "|" + payload;
+        return encoded;
+    }
+
+    bool isBroadcast(){ return destination.ip.empty(); }
+    bool isNewConnection(){ return isBroadcast() && (destination.port==-1); }
+    bool isNewDisconnection(){ return isBroadcast() && (destination.port==-2); }
+};

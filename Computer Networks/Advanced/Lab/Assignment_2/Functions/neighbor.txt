@@ -1,0 +1,12 @@
+void add_neighbor(int sockfd){          // New Peer added to set of neighbors
+    FD_SET(sockfd, &all_neighbors);
+    neighbor_fds.push_back(sockfd);
+    max_fd = max(max_fd, sockfd);
+}
+
+void remove_neighbor(int sockfd){       // Don't remove Peer with sockfd from ID[] or peer[] list. In that case both ID[] and Peer[] for all Peers having id>ID[sockfd] will need to be updated. We have to use set<int> neighbor_fds to efficiently support that in O(logn).
+    close(sockfd);
+    FD_CLR(sockfd, &all_neighbors);
+    while(!FD_ISSET(max_fd, &all_neighbors)) max_fd--;
+    neighbor_fds.erase(find(neighbor_fds.begin(), neighbor_fds.end(), sockfd));
+}

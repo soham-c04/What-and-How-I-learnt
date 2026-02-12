@@ -1,0 +1,19 @@
+void List(bool neighbors_only){
+    int max_len = my.name.size()+6;
+    for(Peer &p:peer) max_len = max(max_len, (int)p.name.size());
+    bool printed = false;
+    for(Peer &p: peer){
+        if(!p.reachable){
+            continue;
+        }
+        else if(neighbors_only){
+            if(p.sockfd != -1){
+                printed = true;
+                p.display(max_len);
+            }
+        }
+        else p.display(max_len);
+    }
+    if(neighbors_only && (!printed)) cout<<"\n- No neighbors to Display";
+    cout<<endl;
+}

@@ -1,0 +1,56 @@
+void Connect(string &IP, string &serv_port){
+    int portno;
+    try{
+        portno = stoi(serv_port);
+    }
+    catch(const invalid_argument &e){
+        error("Port no. should be an integer - " + serv_port);
+        return;
+    }
+
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0){
+        error("Socket - " + to_string(sockfd));
+        return;
+    }
+    
+    // Check if peer is already a neighbor. In that case don't connect again
+    for(Peer &p:peer){
+        if(p.sockfd!=-1){
+            if((p.ip==IP) && (p.port==portno)) return;
+        }
+    }
+
+    sockaddr_in serv_addr{};
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(portno);
+
+    if(inet_pton(AF_INET, IP.c_str(), &serv_addr.sin_addr) <= 0){
+        error("Invalid IP - " + IP);
+        close(sockfd);
+        return;
+    }
+    else if(connect(sockfd, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0){
+        error("Connect - " + serv_port);
+        close(sockfd);
+        return;
+    }
+
+    add_neighbor(sockfd);
+    Send(sockfd, my.encode());
+    sleep(1);
+    string name = Read(sockfd);
+    debug("Listen - " + name);
+    auto it = ID.find({IP, portno});
+    if(it == ID.end()){                                     
+        int id = ID[{IP, portno}] = ID.size();
+        peer.push_back(Peer(id, name, IP, portno, sockfd));
+        peer.back().connected();
+        castNewConnection(sockfd);     // Cast Connection only if they were not previously connected.
+        // debug("Accept casted");
+    }
+    else{
+        peer[it->second].sockfd = sockfd;
+        debug("Preivously Connected");
+    }
+}

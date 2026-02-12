@@ -1,0 +1,70 @@
+struct Peer{
+    int id;
+    string name;
+    string ip;
+    int port;
+    int sockfd;                 // If Peer is a neighbor then what is his sockfd. Set to -1 if Peer is not a neighbor.
+    bool reachable;             // Has to be set to "false" if after disconnection of a certain client this Peer is no longer reachable.
+
+    Peer(int id=-1, string name="", string ip="", int port=-10, int sockfd=-1){
+        this->id = id;
+        this->name = name;
+        this->ip = ip;
+        this->port = port;
+        this->sockfd = sockfd;
+        reachable = true;
+    }
+
+    bool operator==(const Peer& other) const{
+        return(ip==other.ip) && (port==other.port);
+    }
+
+    void display(int padding){
+        if(id==0){
+            cout<<"(You) ";
+            padding-=6;
+        }
+        printf("%-*s : ID=%d    IP=%s   port=%d\n", padding, name.c_str(), id, ip.c_str(), port);
+    }
+
+    void print(string message, bool private_=false){
+        if(private_) printf("\n[%d] %s -> You : %s\n", id, name.c_str(), message.c_str());
+        else printf("\n[%d] %s : %s\n", id, name.c_str(), message.c_str());
+        fflush(stdout);
+    }
+
+    string encode(){
+        return ip + "#" + to_string(port) + "#" + name + "\n"; 
+    }
+
+    static tuple<string, int, string> decode(string &s){
+        stringstream ss(s);
+        string ip, port, name;
+        if(!getline(ss, ip, '#')) return {"", -10, ""};
+        if(!getline(ss, port, '#')) return {"", -10, ""};
+        if(!getline(ss, name, '\n')) return {"", -10, ""};
+        int portno;
+        try{
+            portno = stoi(port);
+        }
+        catch(const invalid_argument &e){
+            error("Peer::decode - Port no should be an integer - " + port);
+        }
+        return {ip, portno, name};
+    }
+
+    void connected(){
+        printf("\n[+] %s Connected : ID=%d    IP=%s port=%d\n", name.c_str(), id, ip.c_str(), port);
+        fflush(stdout);
+    }
+
+    void disconnected(){
+        printf("\n[-] %s(%d) Disconnected\n", name.c_str(), id);
+        fflush(stdout);    
+        // Reset Peer values   
+        id = sockfd = -1;
+        port = -10;
+        reachable = false;
+        name = ip = "";
+    }
+};

@@ -1,0 +1,37 @@
+void castNewConnection(int sockfd){
+    string payload;
+    for(Peer &p:peer) payload += p.encode();
+    Message announce(-1, payload);
+    string message = announce.encode();
+    Send(sockfd, message);
+}
+
+void readNewConnection(Message &req){
+    stringstream ss(req.payload);
+    while(true){
+        string ip, port, name;
+        if(!getline(ss, ip, '#')) break;
+        if(!getline(ss, port, '#')) break;
+        if(!getline(ss, name, '\n')) break;
+        debug("New Connection - " + ip + " , " + port + " , " + name);
+        int portno;
+        try{
+            portno = stoi(port);
+        }
+        catch(const invalid_argument &e){
+            error("New Connection port should be an integer - " + port);
+            debug(req.payload + " - " + ip + " , " + port + " , " + name);
+        }
+        auto it = ID.find({ip, portno});
+        int id;
+        if(it == ID.end()){                                     // Already connected previously
+            id = ID[{ip, portno}] = ID.size();
+            peer.push_back(Peer(id, name, ip, portno));
+            peer[id].connected();
+        }
+        else if(it->second > 0){
+            id = it->second;
+            peer[id].name = name;
+        }
+    }
+}

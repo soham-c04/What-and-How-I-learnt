@@ -1,0 +1,27 @@
+bool Command(){
+    string input;
+    getline(cin, input);
+
+    // Divide input comamnd into parts
+    string command,x,y;
+    istringstream iss(input);
+    iss>>command;
+    iss>>x;
+    getline(iss, y);
+
+    if(command=="/help") help();
+    else if(command=="/list") List(x=="neighbors");
+    else if(command=="/connect") Connect(x,y);
+    else if(command=="/msg") msg(x,y);
+    else if(command=="/broadcast"){
+        x+=y;
+        msg("0", x);
+    }
+    else if(command=="/exit"){
+        castNewDisconnection();     // Announce to everyone that you disconnected
+        return false;               // Exit program
+    }
+    else msg("0", input);           // Broadcast by default
+
+    return true;
+}
